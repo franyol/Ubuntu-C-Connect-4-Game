@@ -30,27 +30,28 @@ int main(void)
         com_play = -1;
         if(player == PLAYER_2) //COM COM COM
             com_play = select_move(player);
+        else {
+            command = getch();
 
-        
-        command = getch();
+            if(command==KEY_RIGHT || command==KEY_LEFT){ // If the first value is esc
+                if(command == KEY_RIGHT)
+                    sel_column++;
+                if(command == KEY_LEFT)
+                    sel_column--;
+                
+                if(sel_column < 1)
+                    sel_column = 7;
+                else if(sel_column > 7)
+                    sel_column = 1;
 
-        if(command==KEY_RIGHT || command==KEY_LEFT){ // If the first value is esc
-            if(command == KEY_RIGHT)
-                sel_column++;
-            if(command == KEY_LEFT)
-                sel_column--;
-            
-            if(sel_column < 1)
-                sel_column = 7;
-            else if(sel_column > 7)
-                sel_column = 1;
+                erase_select(cursor);            
+                move_cursor(&cursor, 1, 1+9*(sel_column-1));
+                print_select(cursor, player);
 
-            erase_select(cursor);            
-            move_cursor(&cursor, 1, 1+9*(sel_column-1));
-            print_select(cursor, player);
-
-            refresh();
+                refresh();
+            }
         }
+            
 
         // If selected a column
         if(command == '\n' || command == ' ' || com_play != -1){
