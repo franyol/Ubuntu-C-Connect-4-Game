@@ -2,11 +2,60 @@
 #include "graphics.h"
 #include "logic.h"
 
-
 extern piece_state g_board[6][7];
 
-int main(void)
+int select_option (char** options, int n)
+    /**
+     * @brief Do a select option tui
+     * 
+     * @param options text with options
+     * @param n number of options to select
+     * 
+     * @return the index of the selected option
+     */
 {
+    int i;
+    int selection = 0;
+    int command = '0';
+
+    cursor_t cursor;
+    move_cursor(&cursor, 5, 5);
+    
+    do {
+        /* Clear the terminal. */
+        clear ();
+        for (i = 0; i < n; i++) {
+            if (selection == i)
+                attrset(A_NORMAL | A_BOLD | A_BLINK);
+            else
+                attrset(A_NORMAL);
+
+            move(cursor.y + (i*2), cursor.x);
+            addstr(options[i]);
+            
+        }
+
+        command = getch();
+
+        if (command==KEY_UP || command==KEY_DOWN) { // If the first value is esc
+            if(command == KEY_UP)
+                selection++;
+            if(command == KEY_DOWN)
+                selection--;
+            
+            if(selection < 0)
+                selection = n-1;
+            else if(selection >= n)
+                selection = 0;
+            
+        }
+    } while (command != '\n');
+    
+    clear ();
+    return selection;
+}
+
+int main (void) {
     cursor_t cursor;
 
     int sel_column = 1;
@@ -14,6 +63,10 @@ int main(void)
     int player = PLAYER_1;
     int com_play;
 
+    char* continue_menu[2] = {
+        "Play again",
+        "Exit"
+    };
 
     move_cursor(&cursor, 1, 1);
 
@@ -86,6 +139,27 @@ int main(void)
                     win_message(cursor, "BLUE\nWINS", PLAYER_2);
                 move_cursor(&cursor, tempy, tempx);
                 player = PLAYER_1;
+                getch();
+
+                if (select_option (continue_menu, 2))
+                    command = 27;
+                else {
+                    /* Clean board. */
+                    int i, j;
+                    for (i = 0; i < 6; i++) {
+                        for (j = 0; j < 7; j++) {
+                            g_board[i][j] = EMPTY;
+                        }
+                    }
+
+                    /* Reset variables and print board. */
+                    sel_column = 1;
+                    command = '0';
+                    player = PLAYER_1;
+
+                    print_board(g_board);
+                    print_select(cursor, PLAYER_1);
+                }
             }
             
             else if(player == PLAYER_1)
