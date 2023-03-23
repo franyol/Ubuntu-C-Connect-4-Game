@@ -62,26 +62,33 @@ int main (void) {
     int command = '0';
     int player = PLAYER_1;
     int com_play;
+    int is_com_mode;
 
     char* continue_menu[2] = {
         "Play again",
         "Exit"
     };
 
+    char* mode_menu[2] = {
+        "Player vs COM",
+        "Player vs Player"
+    };
+
     move_cursor(&cursor, 1, 1);
 
     start_graphics();
     
+    is_com_mode = (select_option(mode_menu, 2) == 0);
+
     print_board(g_board);
     print_select(cursor, PLAYER_1);
-
     
     refresh();
 
     // Selecting the column
     do { // Press esc to exit
         com_play = -1;
-        if(player == PLAYER_2) //COM COM COM
+        if(player == PLAYER_2 && is_com_mode)
             com_play = select_move(player);
         else {
             command = getch();
